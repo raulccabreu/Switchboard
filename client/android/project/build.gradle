@@ -44,7 +44,6 @@ android {
     }
 }
 
-//Run with JDK 8
 def release_version = '1.0.0'
 def release_desc = 'Catbag/Switchboard forked from KeepSafe/Switchboard first release'
 def release_group = 'br.com.catbag.switchboard'
@@ -54,9 +53,6 @@ version = release_version
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 bintray {
-    //Put this two on local.properties
-    //bintray.user=<your user>
-    //bintray.apikey=<your api key>
     user = properties.getProperty("bintray.user")
     key = properties.getProperty("bintray.apikey")
     configurations = ['archives']
