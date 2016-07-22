@@ -70,6 +70,9 @@ public class SwitchBoard {
 	
 	private static final String IS_EXPERIMENT_ACTIVE = "isActive";
 	private static final String EXPERIMENT_VALUES = "values";
+
+	private static int mConnectionTimeout = -1;
+	private static int mReadTimeout = -1;
 	
 	
 	/**
@@ -110,6 +113,17 @@ public class SwitchBoard {
 		
 		DEBUG = isDebug;
 	}
+
+	/**
+	 * Set HTTP connection and read timeouts to be used on <code>loadConfig</code> and <code>updateConfigServerUrl</code>.
+	 *
+	 * @param connectionTimeout HTTP connection timeout in milliseconds
+	 * @param readTimeout HTTP read timeout in milliseconds
+	 */
+	public static void setLoadAndUpdateTimeouts(int connectionTimeout, int readTimeout){
+		mConnectionTimeout = connectionTimeout;
+		mReadTimeout = readTimeout;
+	}
 	
 	/**
 	 * Updates the server URLs from remote and stores it locally in the app. This allows to move the server side
@@ -138,7 +152,7 @@ public class SwitchBoard {
 			updateServerUrl = DYNAMIC_CONFIG_SERVER_URL_UPDATE;
 		
 		try {
-			String result = readFromUrlGET(updateServerUrl, "");
+			String result = readFromUrlGET(updateServerUrl, "", mConnectionTimeout, mReadTimeout);
 			if(DEBUG) Log.d(TAG, "Result String: " + result);
 			
 			if(result != null){
@@ -205,7 +219,7 @@ public class SwitchBoard {
 				String params = "uuid="+uuid+"&device="+device+"&lang="+lang+"&country="+country
 						+"&manufacturer="+manufacturer+"&appId="+packageName+"&version="+versionName;
 				if(DEBUG) Log.d(TAG, "Read from server URL: " + serverUrl + params);
-				String serverConfig = readFromUrlGET(serverUrl, params);
+				String serverConfig = readFromUrlGET(serverUrl, params, mConnectionTimeout, mReadTimeout);
 				
 				if(DEBUG) Log.d(TAG, serverConfig);
 				
@@ -333,7 +347,7 @@ public class SwitchBoard {
 	 * @param params String of params. Multiple params seperated with &. No leading ? in string
 	 * @return Returns String from server or null when failed.
 	 */
-	private static String readFromUrlGET(String address, String params) {
+	private static String readFromUrlGET(String address, String params, int connectionTimeout, int readTimeout) {
 		if(address == null || params == null)
 			return null;
 		
@@ -343,6 +357,10 @@ public class SwitchBoard {
 		try {
 			URL url = new URL(completeUrl);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			if(connectionTimeout > -1 && readTimeout > -1) {
+				connection.setConnectTimeout(connectionTimeout);
+				connection.setReadTimeout(readTimeout);
+			}
 			connection.setRequestMethod("GET");
 			connection.setUseCaches(false);
 			connection.setDoOutput(true);

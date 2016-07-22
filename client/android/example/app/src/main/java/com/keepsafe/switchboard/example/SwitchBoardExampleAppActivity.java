@@ -41,7 +41,11 @@ public class SwitchBoardExampleAppActivity extends AppCompatActivity {
         //Initializes the default URLs the first time. 
         Log.d(TAG, "init Server Urls");
         SwitchBoard.initDefaultServerUrls("http://switchboard.herokuapp.com/SwitchboardURLs.php", "http://switchboard.herokuapp.com/SwitchboardDriver.php", true);
-        
+
+        //Set preferable timeouts (if you don`t want the UI locked when a client has a slower net connection, or the server don`t respond)
+        Log.d(TAG, "setting timeouts");
+        SwitchBoard.setLoadAndUpdateTimeouts(1000, 1000);
+
         /* Looks at the server if there are changes in the server URL that should be used in the future
          * 
          * In production you should be loaded asynchronous with AsyncConfigLoader.
