@@ -15,9 +15,6 @@
 */
 package com.keepsafe.switchboard.example;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +24,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
+import com.keepsafe.switchboard.Switch;
 import com.keepsafe.switchboard.SwitchBoard;
 
 public class SwitchBoardExampleAppActivity extends AppCompatActivity {
@@ -84,52 +82,51 @@ public class SwitchBoardExampleAppActivity extends AppCompatActivity {
     }
 
     private void applyExperiment() {
+
+        //Using Switch (a utility class that wrap SwitchBoard methods)
+        Switch homeScreenMessage = new Switch(this, "homeScreenMessage");
+
     	//see if we're in experiment "homeScreenMessage" that we defined on the server
-        if(SwitchBoard.isInExperiment(this, "homeScreenMessage")) {
+        if(homeScreenMessage.isActive()) {
         	Log.d(TAG, "isInExperiment homeScreen");
         	//check if the experiment has values. Only needed when passing custom variables
-        	if(SwitchBoard.hasExperimentValues(this, "homeScreenMessage")) {
+        	if(homeScreenMessage.hasValues()) {
         		Log.d(TAG, "has values");
         		TextView tv = (TextView) findViewById(R.id.messagebox);	
         		tv.setVisibility(View.VISIBLE);
         		
         		//get experiment values
-        		JSONObject values = SwitchBoard.getExperimentValueFromJson(this, "homeScreenMessage");
-        		try {
-        			//getting the user specific values
-					String message = values.getString("message");
-					String messageTitle = values.getString("messageTitle");
-					
-					tv.setText(Html.fromHtml(message));
-					Log.d(TAG, "set message text in UI");
-					
-					/* Track the view in your preferred analytics
-					 * using messageTitle to track test 
-					 */
-					
-					//tracks when user clicks on HTML link from your A/B test
-					tv.setOnClickListener(new OnClickListener() {
-						
-						@Override
-						public void onClick(View v) {
-							/* Track the click in your preferred analytics
-							 * using messageTitle to track test 
-							 */
-						}
-					});
-					
-					
-				} catch (JSONException e) {
-					//catches if your requested JSON object is not in values
-					e.printStackTrace();
-				}
+                //getting the user specific values
+                String message = (String) homeScreenMessage.getValue("message");
+                String messageTitle = (String) homeScreenMessage.getValue("messageTitle");
+
+                tv.setText(Html.fromHtml(message));
+                Log.d(TAG, "set message text in UI");
+
+                /* Track the view in your preferred analytics
+                 * using messageTitle to track test
+                 */
+
+                //tracks when user clicks on HTML link from your A/B test
+                tv.setOnClickListener(new OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        /* Track the click in your preferred analytics
+                         * using messageTitle to track test
+                         */
+                    }
+                });
+
         	}	
         }
     }
     
     public void goNext(View v){
     	Intent i;
-    	
+
+        //Using SwitchBoard directly
+
     	//gives users a different activity when they are in A/B test
     	//example on how to test user flows
     	if(SwitchBoard.isInExperiment(this, "nextActivityTest"))
