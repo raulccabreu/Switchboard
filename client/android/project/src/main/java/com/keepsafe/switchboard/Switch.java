@@ -15,6 +15,7 @@
 */
 package com.keepsafe.switchboard;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -78,5 +79,15 @@ public class Switch {
 			return SwitchBoard.getExperimentValueFromJson(context, experimentName);
 		else
 			return null;
+	}
+
+	public Object getValue(String valueName){
+		JSONObject values = getValues();
+		try {
+			return values.get(valueName);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
