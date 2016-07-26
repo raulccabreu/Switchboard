@@ -81,12 +81,20 @@ public class Switch {
 			return null;
 	}
 
+	/**
+	 * Gives back one specific experiment value in a Object. This function checks if
+	 * values exists. If no values exist, it returns null. If the specfic value don`t exists return null too.
+	 * @param valueName name of the specifc value to return.
+	 * @return specfic value in Object or null if non
+	 */
 	public Object getValue(String valueName){
-		JSONObject values = getValues();
-		try {
-			return values.get(valueName);
-		} catch (JSONException e) {
-			e.printStackTrace();
+		if(hasValues()) {
+			JSONObject values = getValues();
+			try {
+				return values.get(valueName);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
