@@ -94,12 +94,12 @@ public class SwitchBoard {
 	 * SwitchBoard will connect to the staging environment in debug mode. This makes it very simple to test new experiements
 	 * during development.
 	 * @param configServerUpdateUrlStaging Url to http://staging.domain/path_to/SwitchboardURLs.php in staging environment
-	 * @param configServerUrlStaging Url to: http://staging.domain/path_to/SwitchboardDriver.php in production - the acutall config
+	 * @param configServerUrlStaging Url to: http://staging.domain/path_to/SwitchboardDriver.php in staging - the acutall config
 	 * @param configServerUpdateUrl Url to http://staging.domain/path_to/SwitchboardURLs.php in production environment
 	 * @param configServerUrl Url to: http://staging.domain/path_to/SwitchboardDriver.php in production - the acutall config
 	 * @param isDebug Defines if the app runs in debug.
 	 */
-	public static void initDefaultServerUrls(String configServerUpdateUrlStaging, String configServerUrlStaging, 
+	public static void initDefaultServerUrls(String configServerUpdateUrlStaging, String configServerUrlStaging,
 			String configServerUpdateUrl, String configServerUrl,
 			boolean isDebug) {
 		
@@ -214,20 +214,22 @@ public class SwitchBoard {
 			
 			//load config, includes all experiments
 			String serverUrl = Preferences.getDynamicConfigServerUrl(c);
-			
-			if(serverUrl != null) {
-				String params = "uuid="+uuid+"&device="+device+"&lang="+lang+"&country="+country
-						+"&manufacturer="+manufacturer+"&appId="+packageName+"&version="+versionName;
-				if(DEBUG) Log.d(TAG, "Read from server URL: " + serverUrl + params);
-				String serverConfig = readFromUrlGET(serverUrl, params, mConnectionTimeout, mReadTimeout);
-				
-				if(DEBUG) Log.d(TAG, serverConfig);
-				
-				//store experiments in shared prefs (one variable)
-				if(serverConfig != null)
-					Preferences.setDynamicConfigJson(c, serverConfig);
-			}
-			
+
+			//set to default when not set in preferences
+			if(serverUrl == null)
+				serverUrl = DYNAMIC_CONFIG_SERVER_DEFAULT_URL;
+
+			String params = "uuid="+uuid+"&device="+device+"&lang="+lang+"&country="+country
+					+"&manufacturer="+manufacturer+"&appId="+packageName+"&version="+versionName;
+			if(DEBUG) Log.d(TAG, "Read from server URL: " + serverUrl + params);
+			String serverConfig = readFromUrlGET(serverUrl, params, mConnectionTimeout, mReadTimeout);
+
+			if(DEBUG) Log.d(TAG, serverConfig);
+
+			//store experiments in shared prefs (one variable)
+			if(serverConfig != null)
+				Preferences.setDynamicConfigJson(c, serverConfig);
+
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
